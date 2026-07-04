@@ -1,262 +1,216 @@
-01 - Introduction to Web Applications
-Objective
+# HTB Academy Write-up: Introduction to Web Applications
 
-Understand what web applications are, how they differ from traditional websites and native applications, and why web application security is important.
+---
 
-What is a Web Application?
+# Objective
 
-A web application is software that runs inside a web browser using a client-server architecture.
+Understand what web applications are, how they differ from traditional websites and native applications, why they are widely used, and the common security risks associated with them.
 
-It consists of:
+---
 
-Frontend (Client-side) – HTML, CSS, JavaScript
-Backend (Server-side) – PHP, Python, Java, Node.js, databases, APIs
+# What is a Web Application?
 
-Instead of installing software locally, users interact with the application through their browser.
+A **web application** is software that runs inside a web browser and follows a **client-server architecture**.
+
+- The **client** (browser) displays the user interface.
+- The **server** processes requests, executes application logic, and interacts with databases.
 
 Examples include:
 
-Gmail
-Amazon
-Google Docs
-GitHub
-Hack The Box
-Client-Server Architecture
-User
-   │
-Browser
-   │
-HTTP/HTTPS
-   │
-Web Server
-   │
-Application Logic
-   │
-Database
+- Gmail
+- Amazon
+- Google Docs
+- Hack The Box
 
-The browser sends HTTP requests.
+Unlike static websites, web applications provide dynamic and interactive content based on user actions.
 
-The server processes the request and returns a response.
+---
 
-Web Applications vs Websites
-Website	Web Application
-Static content	Dynamic content
-Same for every visitor	Different for each user
-Limited interaction	Highly interactive
-Mostly informational	Performs business logic
+# Client-Server Architecture
+
+A web application consists of two main components.
+
+| Component | Description |
+|----------|-------------|
+| Client | The user's web browser that sends requests and displays responses. |
+| Server | Processes requests, executes application logic, and returns data to the client. |
+
+Basic workflow:
+
+```
+Browser → HTTP Request → Web Server
+Browser ← HTTP Response ← Web Server
+```
+
+---
+
+# Websites vs Web Applications
+
+Traditional websites mainly display static information, while web applications provide dynamic functionality.
+
+| Website | Web Application |
+|---------|-----------------|
+| Static content | Dynamic content |
+| Same for every visitor | Personalized content |
+| Limited interaction | Interactive functionality |
+| Manual updates | Real-time updates |
+
+Static websites are commonly referred to as **Web 1.0**, while interactive applications are known as **Web 2.0**.
+
+---
+
+# Web Applications vs Native Applications
+
+Web applications differ from desktop or mobile applications in several ways.
+
+| Web Application | Native Application |
+|----------------|--------------------|
+| Runs in a browser | Installed on the operating system |
+| Platform independent | Platform specific |
+| Updated on the server | Requires software updates |
+| No installation required | Installation required |
+
+---
+
+# Advantages of Web Applications
+
+- Platform independent
+- Accessible from any device with a browser
+- Centralized updates
+- No installation required
+- Lower maintenance costs
+- Easy deployment
+
+---
+
+# Disadvantages of Web Applications
+
+- Dependent on an internet connection
+- Limited access to operating system features
+- Generally slower than native applications
+- Browser compatibility issues
+
+---
+
+# Common Web Applications
+
+### Open Source
+
+- WordPress
+- Joomla
+- OpenCart
+
+### Proprietary
+
+- Shopify
+- Wix
+- DotNetNuke
+
+---
+
+# Why Web Applications are Security Targets
+
+Web applications are publicly accessible and often connected to sensitive databases.
+
+A successful attack may expose:
+
+- User credentials
+- Customer information
+- Corporate data
+- Internal systems
+- Administrative functionality
+
+Since web applications are frequently updated, new vulnerabilities may be introduced during development.
+
+---
+
+# Common Web Application Vulnerabilities
+
+| Vulnerability | Impact |
+|--------------|--------|
+| SQL Injection | Database compromise |
+| Cross-Site Scripting (XSS) | JavaScript execution in users' browsers |
+| File Inclusion | Read sensitive files or execute code |
+| Unrestricted File Upload | Remote Code Execution |
+| IDOR | Access another user's data |
+| Broken Access Control | Privilege escalation |
+
+---
+
+# Real-World Attack Examples
+
+### SQL Injection
+
+Extract database information such as usernames and email addresses.
+
+### File Inclusion
+
+Read application source code and discover hidden functionality.
+
+### Unrestricted File Upload
+
+Upload a malicious file to gain Remote Code Execution (RCE).
+
+### Insecure Direct Object Reference (IDOR)
+
+Modify object identifiers to access another user's resources.
 
 Example:
 
-Website
+```
+/user/701/edit-profile
+```
 
-About Us
-Contact
-Services
+Changing the ID:
 
-Web Application
+```
+/user/702/edit-profile
+```
 
-Login
-Dashboard
-Shopping Cart
-Search
-File Upload
-Messaging
-Web Applications vs Native Applications
-Native Applications
-Installed locally
-Faster
-Access operating system resources
-Platform specific
+may allow access to another user's profile if authorization is not enforced.
 
-Examples
+### Broken Access Control
 
-Microsoft Word
-Discord Desktop
-VLC
-Web Applications
-No installation required
-Runs in browser
-Platform independent
-Centralized updates
+Manipulating request parameters to gain administrator privileges.
 
-Examples
+Example:
 
-Gmail
-Google Docs
-Trello
-Types of Web Applications
-Open Source
+```
+roleid=3
+```
 
-Source code is publicly available.
+Changing it to:
 
-Examples:
+```
+roleid=1
+```
 
-WordPress
-Joomla
-OpenCart
+could create an administrator account if proper validation is missing.
 
-Advantages
+---
 
-Free
-Customizable
-Community support
-Closed Source
+# Importance of Web Application Security
 
-Owned by companies.
+Web application penetration testing helps identify security weaknesses before attackers can exploit them.
 
-Examples
+A typical assessment includes:
 
-Shopify
-Wix
-DotNetNuke
+- Testing front-end technologies (HTML, CSS, JavaScript)
+- Enumerating server technologies
+- Testing authenticated functionality
+- Testing unauthenticated functionality
+- Identifying vulnerabilities
+- Verifying security controls
 
-Advantages
+Industry-standard methodologies such as the **OWASP Web Security Testing Guide (WSTG)** are commonly followed during assessments.
 
-Commercial support
-Managed updates
-Why Are Web Applications Attractive Targets?
+---
 
-Web applications are:
+# Key Takeaways
 
-Publicly accessible
-Constantly changing
-Connected to databases
-Store sensitive information
-
-If compromised, attackers may gain:
-
-User credentials
-Customer information
-Source code
-Database access
-Remote code execution
-Common Web Application Vulnerabilities
-SQL Injection (SQLi)
-
-Unsafe user input is executed as SQL queries.
-
-Impact
-
-Read database
-Modify records
-Authentication bypass
-Remote code execution (in some cases)
-File Inclusion
-
-Allows attackers to include unintended files.
-
-Impact
-
-Read sensitive files
-Execute malicious code
-Obtain configuration files
-Unrestricted File Upload
-
-Application accepts dangerous file types.
-
-Example
-
-Uploading
-
-shell.php
-
-instead of
-
-image.jpg
-
-Impact
-
-Remote Code Execution
-Full server compromise
-Insecure Direct Object Reference (IDOR)
-
-User changes object identifiers.
-
-Example
-
-/user/101
-
-↓
-
-/user/102
-
-Impact
-
-Access another user's information.
-
-Broken Access Control
-
-Application fails to enforce permissions.
-
-Example
-
-Changing
-
-role=3
-
-↓
-
-role=1
-
-Impact
-
-Privilege escalation.
-
-Why Learn Web Application Security?
-
-Modern penetration tests focus heavily on web applications because:
-
-Nearly every company exposes web applications
-Web vulnerabilities often lead to full compromise
-Small coding mistakes can have severe consequences
-
-Understanding web applications is essential for:
-
-Bug Bounty Hunting
-Penetration Testing
-Application Security
-Red Teaming
-Typical Web Penetration Testing Workflow
-Reconnaissance
-        │
-        ▼
-Technology Identification
-        │
-        ▼
-Directory & File Enumeration
-        │
-        ▼
-Authentication Testing
-        │
-        ▼
-Input Validation Testing
-        │
-        ▼
-Business Logic Testing
-        │
-        ▼
-Exploitation
-        │
-        ▼
-Reporting
-Real-World Attack Examples
-Vulnerability	Potential Impact
-SQL Injection	Dump user database, extract usernames
-File Upload	Remote Code Execution
-IDOR	Access another user's data
-Broken Access Control	Become administrator
-File Inclusion	Read configuration files
-Key Takeaways
-Web applications are dynamic client-server applications.
-They differ significantly from static websites.
-Most organizations rely on web applications.
-Public exposure makes them attractive attack targets.
-Understanding web technologies is the foundation of Application Security.
-Common vulnerabilities include SQL Injection, IDOR, File Upload, File Inclusion, and Broken Access Control.
-Web penetration testing follows a structured methodology beginning with reconnaissance and enumeration.
-Skills Learned
-Understanding client-server architecture
-Difference between websites and web applications
-Understanding common web application attack surfaces
-Introduction to common web vulnerabilities
-Understanding why web application security is important
+- Web applications run in a browser using a client-server architecture.
+- They provide dynamic, interactive functionality unlike traditional websites.
+- Web applications are platform independent and centrally managed.
+- Because they are internet-facing, they present a large attack surface.
+- Common vulnerabilities include SQL Injection, XSS, File Inclusion, IDOR, and Broken Access Control.
+- Understanding how web applications work is essential for effective penetration testing.
