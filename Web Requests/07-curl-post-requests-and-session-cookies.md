@@ -1,157 +1,232 @@
-cURL - POST Requests & Session Cookies
-Lab Information
-Category	HTTP Requests
-Topic	POST Requests, Session Cookies, JSON Requests
-Difficulty	Easy
-Goal	Authenticate, capture the session cookie, and use it to send an authenticated JSON POST request with cURL
-Objective
-Authenticate using a login form
-Capture the session cookie
-Reuse the cookie with cURL
-Send a JSON POST request
-Retrieve the hidden flag
-Step 1 - Visit the Application
+# HTB Academy Write-up: cURL POST Requests and Session Cookies
 
-Browse to the target application.
+---
 
-The login page contains:
+# Objective
 
-Username
-Password
-Login button
+Learn how to send **HTTP POST requests** using cURL, authenticate through web login forms, manage **session cookies**, and interact with JSON-based APIs.
 
-Use the provided credentials:
+---
 
-Username: admin
-Password: admin
-Step 2 - Inspect the Login Request
+# HTTP POST Requests
 
-Open Developer Tools.
+Unlike GET requests, POST requests send data inside the **HTTP request body** instead of the URL.
 
-F12
+### Advantages of POST
 
-Navigate to:
+| Feature | Description |
+|---------|-------------|
+| Hidden Parameters | Data is sent in the request body instead of the URL. |
+| Supports Large Data | Suitable for file uploads and large payloads. |
+| Binary Data | Can transmit binary content without URL limitations. |
 
-Network
+---
 
-Login using:
+# Sending POST Requests with cURL
 
-admin
-admin
+Use the **-X POST** option to specify the HTTP method and **-d** to include request data.
 
-A POST request is sent to the server.
-
-Request body:
-
-username=admin&password=admin
-Step 3 - Authenticate Using cURL
-
-Replicate the login request.
-
+```bash
 curl -X POST \
 -d "username=admin&password=admin" \
-http://IP:PORT/
+http://SERVER_IP
+```
 
-The response returns the authenticated page.
+Successful authentication returns the authenticated page instead of the login page.
 
-Step 4 - Capture the Session Cookie
+---
 
-Display the response headers.
+# Following Redirects
 
-curl -i -X POST \
+Some applications redirect users after login.
+
+Use:
+
+```bash
+curl -L \
+-X POST \
 -d "username=admin&password=admin" \
-http://IP:PORT/
+http://SERVER_IP
+```
 
-Example response:
+The **-L** option automatically follows HTTP redirects.
 
-HTTP/1.1 200 OK
+---
 
-Set-Cookie: PHPSESSID=c1nsa6op7vtk7kdis7bcnbadf1
+# Viewing Response Headers
 
-The important value is:
+Use **-i** to display response headers.
 
-PHPSESSID=<session_id>
-Step 5 - Reuse the Session Cookie
-
-Use the authenticated session cookie with cURL.
-
-curl -b "PHPSESSID=<session_id>" \
-http://IP:PORT/
-
-Instead of the login page, the application returns the authenticated search page.
-
-Step 6 - Inspect the Search Request
-
-Search for any city.
+```bash
+curl -i \
+-X POST \
+-d "username=admin&password=admin" \
+http://SERVER_IP
+```
 
 Example:
 
-London
+```
+HTTP/1.1 200 OK
 
-Developer Tools shows a POST request sent to:
+Set-Cookie: PHPSESSID=xxxxxxxxxxxxxxxx
+```
 
+The server issues a session cookie after successful authentication.
+
+---
+
+# Session Cookies
+
+Most web applications use cookies to maintain authenticated sessions.
+
+Example:
+
+```
+PHPSESSID=c1nsa6op7vtk7kdis7bcnbadf1
+```
+
+Once the session cookie is obtained, credentials no longer need to be sent with every request.
+
+---
+
+# Using Cookies with cURL
+
+Use the **-b** option to include a cookie.
+
+```bash
+curl \
+-b "PHPSESSID=c1nsa6op7vtk7kdis7bcnbadf1" \
+http://SERVER_IP
+```
+
+Equivalent request using an HTTP header:
+
+```bash
+curl \
+-H "Cookie: PHPSESSID=c1nsa6op7vtk7kdis7bcnbadf1" \
+http://SERVER_IP
+```
+
+---
+
+# JSON POST Requests
+
+Many modern web applications exchange data in JSON format.
+
+Example request body:
+
+```json
+{
+    "search":"london"
+}
+```
+
+The request must include the correct Content-Type header.
+
+```bash
+curl \
+-X POST \
+-d '{"search":"london"}' \
+-H "Content-Type: application/json" \
+http://SERVER_IP/search.php
+```
+
+---
+
+# Sending Authenticated JSON Requests
+
+Combine the session cookie with the JSON request.
+
+```bash
+curl \
+-X POST \
+-d '{"search":"london"}' \
+-H "Content-Type: application/json" \
+-b "PHPSESSID=c1nsa6op7vtk7kdis7bcnbadf1" \
+http://SERVER_IP/search.php
+```
+
+Example response:
+
+```json
+[
+    "London (UK)"
+]
+```
+
+---
+
+# Browser Developer Tools
+
+The Network tab can be used to inspect POST requests.
+
+Useful information includes:
+
+- Request Method
+- Request URL
+- POST Body
+- Content-Type
+- Session Cookies
+- Response Data
+- Copy as cURL
+- Copy as Fetch
+
+This makes it easy to reproduce requests directly from the terminal.
+
+---
+
+# Exercise Summary
+
+The application used a PHP login form for authentication.
+
+Steps performed:
+
+1. Log in using valid credentials.
+
+```bash
+curl -X POST \
+-d "username=admin&password=admin" \
+http://SERVER_IP
+```
+
+2. Obtain the session cookie from the response headers.
+
+```
+Set-Cookie: PHPSESSID=...
+```
+
+3. Inspect the browser's Network tab to identify the JSON request sent to:
+
+```
 /search.php
+```
 
-Request body:
+4. Reproduce the request using the authenticated session cookie.
 
-{"search":"London"}
-
-Request header:
-
-Content-Type: application/json
-Step 7 - Search for the Flag
-
-Replace the search value with:
-
-flag
-
-Send the request using the authenticated cookie.
-
-curl -X POST \
--b "PHPSESSID=<session_id>" \
--H "Content-Type: application/json" \
+```bash
+curl \
+-X POST \
 -d '{"search":"flag"}' \
-http://IP:PORT/search.php
-Step 8 - Retrieve the Flag
-
-The application returns:
-
-HTB{p0$t_r3p34t3r}
-Flag
-HTB{p0$t_r3p34t3r}
-Key Concepts Learned
-HTTP POST requests
-Form-based authentication
-Session management using cookies
-Set-Cookie response header
-Sending cookies with cURL
-JSON request bodies
-Content-Type: application/json
-Interacting directly with backend endpoints
-Useful Commands
-Login
-curl -X POST \
--d "username=admin&password=admin" \
-http://IP:PORT/
-View Response Headers
-curl -i -X POST \
--d "username=admin&password=admin" \
-http://IP:PORT/
-Access Using Session Cookie
-curl -b "PHPSESSID=<session_id>" \
-http://IP:PORT/
-Send JSON POST Request
-curl -X POST \
--b "PHPSESSID=<session_id>" \
 -H "Content-Type: application/json" \
--d '{"search":"flag"}' \
-http://IP:PORT/search.php
-What I Learned
-How web applications authenticate users using POST requests.
-How to inspect login requests with Developer Tools.
-How to extract and reuse session cookies.
-How authenticated sessions are maintained using PHPSESSID.
-How to send JSON data using cURL.
-How to communicate directly with backend endpoints without using the web interface.
-How to combine cookies and JSON requests to access protected functionality and retrieve hidden data.
+-b "PHPSESSID=<SESSION_ID>" \
+http://SERVER_IP/search.php
+```
+
+5. Retrieve the flag.
+
+```
+HTB{p0$t_r3p34t3r}
+```
+
+---
+
+# Key Takeaways
+
+- POST requests send data in the request body.
+- The **-d** option is used to include POST data.
+- Session cookies maintain authenticated user sessions.
+- The **-b** option allows cURL to send cookies.
+- JSON requests require the **Content-Type: application/json** header.
+- Browser DevTools simplify request analysis and reproduction using cURL.
 
