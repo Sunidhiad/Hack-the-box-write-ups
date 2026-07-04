@@ -1,123 +1,153 @@
-cURL - GET Requests & Basic Authentication
-Lab Information
-Category	HTTP Requests
-Topic	GET Requests, Basic Authentication, cURL
-Difficulty	Easy
-Goal	Authenticate using HTTP Basic Auth and retrieve the hidden flag using cURL
-Objective
-Authenticate using HTTP Basic Authentication
-Inspect browser requests using Developer Tools
-Recreate the request with cURL
-Search for the keyword flag
-Obtain the flag
-Step 1 - Visit the Application
+# cURL GET Requests and Basic Authentication
 
-Open the target URL.
+## Objective
 
-The page prompts for:
+Learn how to use cURL to interact with web applications that use HTTP Basic Authentication, inspect HTTP headers, and perform authenticated GET requests to retrieve protected resources.
 
-Username
-Password
+---
 
-The credentials provided by the lab are:
+# HTTP Basic Authentication
 
-Username: admin
-Password: admin
-Step 2 - Authenticate
+HTTP Basic Authentication is one of the simplest authentication mechanisms used by web servers. When a client attempts to access a protected resource, the server responds with a **401 Unauthorized** status and includes a `WWW-Authenticate` header.
 
-Login using:
+Example response:
 
-admin
-admin
+```http
+HTTP/1.1 401 Unauthorized
+WWW-Authenticate: Basic realm="Access denied"
 
-After authentication, the application displays a City Search feature.
+The client must then provide a username and password encoded in Base64 using the Authorization header.
 
-Step 3 - Inspect the Request
+Accessing a Protected Resource
 
-Open browser Developer Tools.
+Attempting to access the application without authentication returns a 401 Unauthorized response.
 
-F12
+curl -i http://<SERVER_IP>:<PORT>/
 
-Go to:
+Example response:
 
-Network
+HTTP/1.1 401 Unauthorized
+WWW-Authenticate: Basic realm="Access denied"
+Authenticating with cURL
 
-Clear previous requests.
+The easiest way to authenticate is with the -u option.
 
-Search for any city, for example:
+curl -u admin:admin http://<SERVER_IP>:<PORT>/
 
-le
+If the credentials are correct, the server returns the protected page.
 
-A new request appears.
+Authentication Using the URL
 
-Example:
+Basic Authentication credentials can also be supplied directly in the URL.
+
+curl http://admin:admin@<SERVER_IP>:<PORT>/
+
+Although this works, using the -u option is generally preferred.
+
+Viewing the Authorization Header
+
+Using the verbose option (-v) displays the complete HTTP request.
+
+curl -v http://admin:admin@<SERVER_IP>:<PORT>/
+
+Example request:
+
+GET / HTTP/1.1
+Host: <SERVER_IP>
+Authorization: Basic YWRtaW46YWRtaW4=
+
+The value after Basic is the Base64 encoding of:
+
+admin:admin
+Sending the Authorization Header Manually
+
+Instead of using -u, the Authorization header can be added manually.
+
+curl \
+-H "Authorization: Basic YWRtaW46YWRtaW4=" \
+http://<SERVER_IP>:<PORT>/
+
+This produces the same authenticated request.
+
+Discovering GET Requests
+
+After authentication, the application provides a city search feature.
+
+Using the browser's Developer Tools (Network tab), searching for a city reveals the following request:
 
 GET /search.php?search=le
 
-The request contains:
+This indicates that the application uses a GET parameter named search.
 
-Authorization: Basic YWRtaW46YWRtaW4=
+Replaying the Request with cURL
 
-which is the Base64 encoding of:
+The same request can be reproduced directly using cURL.
 
-admin:admin
-Step 4 - Copy the Request
+curl \
+-H "Authorization: Basic YWRtaW46YWRtaW4=" \
+"http://<SERVER_IP>:<PORT>/search.php?search=le"
 
-Right-click the request.
+Example response:
 
-Copy
-→ Copy as cURL
+Leeds (UK)
+Leicester (UK)
+Browser Developer Tools
 
-The generated request is similar to:
+Developer Tools are extremely useful for web application testing.
 
-curl 'http://IP:PORT/search.php?search=le' \
--H 'Authorization: Basic YWRtaW46YWRtaW4='
-Step 5 - Search for the Flag
+The Network tab allows you to:
 
-Replace the search value with:
+View every HTTP request
+Inspect request headers
+Inspect response headers
+Copy requests as cURL
+Identify GET and POST parameters
 
-flag
+This information makes reproducing requests with cURL much easier.
 
-Command:
+HTB Lab Walkthrough
+Step 1 — Authenticate
 
-curl "http://IP:PORT/search.php?search=flag" \
--H "Authorization: Basic YWRtaW46YWRtaW4="
-Step 6 - Retrieve the Flag
+Login using the provided credentials.
 
-The server returns:
+Username:
+
+admin
+
+Password:
+
+admin
+Step 2 — Inspect the Search Request
+
+Open the browser's Developer Tools.
+
+Navigate to:
+
+Network
+
+Search for any city.
+
+Observe the request:
+
+/search.php?search=<value>
+Step 3 — Replay the Request with cURL
+
+Replace the search value with flag.
+
+curl \
+-H "Authorization: Basic YWRtaW46YWRtaW4=" \
+"http://<SERVER_IP>:<PORT>/search.php?search=flag"
+Step 4 — Retrieve the Flag
+
+The response returns:
 
 HTB{curl_g3773r}
 Flag
 HTB{curl_g3773r}
-Key Concepts Learned
-HTTP Basic Authentication
-Authorization header
-Base64 encoded credentials
-Browser Developer Tools
-Network request inspection
-Copy as cURL
-Sending authenticated GET requests
-Using cURL to interact directly with web applications
-Useful Commands
-
-Authenticate using username/password:
-
-curl -u admin:admin http://IP:PORT/
-
-Authenticate using Authorization header:
-
-curl -H "Authorization: Basic YWRtaW46YWRtaW4=" http://IP:PORT/
-
-Search using GET parameter:
-
-curl "http://IP:PORT/search.php?search=flag" \
--H "Authorization: Basic YWRtaW46YWRtaW4="
-What I Learned
-How HTTP Basic Authentication works.
-How to inspect HTTP requests using browser Developer Tools.
-How to identify GET parameters used by a web application.
-How to recreate browser requests using cURL.
-How to use the Authorization header to access protected resources.
-How to retrieve hidden information by modifying GET parameter values.
-
-This format matches a clean GitHub write-up style and fits well with your PortSwigger/HTB Academy notes repository.
+Key Takeaways
+HTTP Basic Authentication uses the Authorization header.
+The -u option in cURL automatically creates the required authentication header.
+Protected resources return 401 Unauthorized until valid credentials are supplied.
+Browser Developer Tools can reveal hidden API requests.
+GET parameters can be modified and replayed directly with cURL.
+Reproducing browser requests manually is a fundamental web penetration testing skill.
