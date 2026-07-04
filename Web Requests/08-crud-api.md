@@ -1,125 +1,205 @@
-CRUD API
-🎯 Objective
+# HTB Academy Write-up: CRUD API
 
-Learn how to interact directly with a REST-style API using cURL and perform all four CRUD operations:
+---
 
-Create (POST)
-Read (GET)
-Update (PUT)
-Delete (DELETE)
+# Objective
 
-Finally, manipulate the API to retrieve the hidden flag.
+Learn how to interact with REST-style APIs using cURL and perform the four basic CRUD (Create, Read, Update, Delete) operations through different HTTP methods.
 
-Skills Learned
-Using cURL with REST APIs
-Reading JSON responses
-Formatting JSON using jq
-Sending JSON request bodies
-Using HTTP methods:
-GET
-POST
-PUT
-DELETE
-Modifying API resources
-Understanding CRUD
-Operation	HTTP Method	Purpose
-Create	POST	Add new data
-Read	GET	Retrieve data
-Update	PUT	Modify existing data
-Delete	DELETE	Remove data
-Reading API Data (GET)
+---
 
-Retrieve information about a city.
+# What is an API?
 
-curl http://<SERVER_IP>:<PORT>/api.php/city/london
+An **Application Programming Interface (API)** allows applications to communicate with each other.
 
-Pretty-print JSON output:
+Web APIs commonly expose resources through URLs and use HTTP methods to perform different operations.
 
-curl -s http://<SERVER_IP>:<PORT>/api.php/city/london | jq
+Example endpoint:
 
-Example output:
+```
+http://SERVER_IP/api.php/city/london
+```
 
-[
-  {
-    "city_name": "London",
-    "country_name": "(UK)"
-  }
-]
+This endpoint targets the **city** resource with **london** as the selected record.
 
-Retrieve all cities:
+---
 
-curl -s http://<SERVER_IP>:<PORT>/api.php/city/ | jq
-Creating a New City (POST)
+# CRUD Operations
 
-Add a new record to the database.
+CRUD represents the four primary database operations.
 
+| Operation | HTTP Method | Description |
+|-----------|-------------|-------------|
+| Create | POST | Creates a new resource. |
+| Read | GET | Retrieves existing data. |
+| Update | PUT | Modifies an existing resource. |
+| Delete | DELETE | Removes a resource. |
+
+---
+
+# Reading Data (GET)
+
+Retrieve a specific resource.
+
+```bash
+curl http://SERVER_IP/api.php/city/london
+```
+
+Pretty-print the JSON output using **jq**.
+
+```bash
+curl -s http://SERVER_IP/api.php/city/london | jq
+```
+
+Retrieve all matching cities.
+
+```bash
+curl -s http://SERVER_IP/api.php/city/le | jq
+```
+
+Retrieve every record.
+
+```bash
+curl -s http://SERVER_IP/api.php/city/ | jq
+```
+
+---
+
+# Creating Data (POST)
+
+Use the **POST** method to add a new resource.
+
+```bash
 curl -X POST \
-http://<SERVER_IP>:<PORT>/api.php/city/ \
+http://SERVER_IP/api.php/city/ \
 -d '{"city_name":"HTB_City","country_name":"HTB"}' \
 -H "Content-Type: application/json"
+```
 
-Verify:
+Verify the new entry.
 
-curl -s http://<SERVER_IP>:<PORT>/api.php/city/HTB_City | jq
-Updating Existing Data (PUT)
+```bash
+curl -s http://SERVER_IP/api.php/city/HTB_City | jq
+```
 
-Modify an existing city.
+---
 
-Example:
+# Updating Data (PUT)
 
+Use the **PUT** method to modify an existing resource.
+
+```bash
 curl -X PUT \
-http://<SERVER_IP>:<PORT>/api.php/city/london \
+http://SERVER_IP/api.php/city/london \
 -d '{"city_name":"New_HTB_City","country_name":"HTB"}' \
 -H "Content-Type: application/json"
+```
 
-Verify:
+Verify the update.
 
-curl -s http://<SERVER_IP>:<PORT>/api.php/city/New_HTB_City | jq
-Deleting Data (DELETE)
+```bash
+curl -s http://SERVER_IP/api.php/city/New_HTB_City | jq
+```
 
-Remove an entry.
+---
 
+# Deleting Data (DELETE)
+
+Remove a resource using the **DELETE** method.
+
+```bash
 curl -X DELETE \
-http://<SERVER_IP>:<PORT>/api.php/city/New_HTB_City
+http://SERVER_IP/api.php/city/New_HTB_City
+```
 
-Verify deletion:
+Confirm deletion.
 
-curl -s http://<SERVER_IP>:<PORT>/api.php/city/New_HTB_City | jq
+```bash
+curl -s http://SERVER_IP/api.php/city/New_HTB_City | jq
+```
 
-Expected output:
+Expected response:
 
+```json
 []
-Lab Walkthrough
-Step 1 — Update Any City to flag
+```
 
-Choose an existing city (for example, London).
+---
 
+# JSON Responses
+
+Most REST APIs exchange data using JSON.
+
+Example response:
+
+```json
+[
+    {
+        "city_name": "London",
+        "country_name": "(UK)"
+    }
+]
+```
+
+The **jq** utility formats JSON output, making it easier to read during assessments.
+
+---
+
+# Common cURL Commands
+
+| Task | Command |
+|------|---------|
+| Read | `curl URL` |
+| Pretty JSON | `curl -s URL \| jq` |
+| Create | `curl -X POST` |
+| Update | `curl -X PUT` |
+| Delete | `curl -X DELETE` |
+
+---
+
+# Exercise Summary
+
+The lab demonstrated all four CRUD operations through a REST-style API.
+
+Steps performed:
+
+1. Update an existing city to **flag**.
+
+```bash
 curl -X PUT \
-http://<SERVER_IP>:<PORT>/api.php/city/london \
+http://SERVER_IP/api.php/city/london \
 -d '{"city_name":"flag","country_name":"HTB"}' \
 -H "Content-Type: application/json"
-Step 2 — Delete Any City
+```
 
-Delete another city.
+2. Delete any city.
 
-Example:
-
+```bash
 curl -X DELETE \
-http://<SERVER_IP>:<PORT>/api.php/city/leeds
-Step 3 — Search for flag
-curl -s http://<SERVER_IP>:<PORT>/api.php/city/flag | jq
+http://SERVER_IP/api.php/city/Leeds
+```
 
-The response contains the flag.
+3. Search for the updated city.
 
+```bash
+curl -s http://SERVER_IP/api.php/city/flag | jq
+```
+
+4. Retrieve the flag.
+
+```
 HTB{crud_4p!_m4n!pul4t0r}
-Flag
-HTB{crud_4p!_m4n!pul4t0r}
-Key Takeaways
-APIs commonly expose CRUD functionality through HTTP methods.
-GET retrieves resources.
-POST creates new records.
-PUT modifies existing records.
-DELETE removes records.
-JSON APIs require the Content-Type: application/json header.
-jq makes JSON responses easier to read.
-cURL is a powerful tool for interacting directly with APIs without using the web interface.
+```
+
+---
+
+# Key Takeaways
+
+- REST APIs commonly implement CRUD functionality.
+- GET retrieves resources from an API.
+- POST creates new resources.
+- PUT updates existing resources.
+- DELETE removes resources.
+- JSON is the standard format for exchanging API data.
+- The **jq** utility is useful for formatting JSON responses.
+- cURL can fully interact with REST APIs from the command line.
